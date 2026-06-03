@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  fullName  String
+  email     String   @unique
+  phone     String?
+  role      String   @default("OPERATOR")
+  isOnline  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id            String         @id @default(uuid())
+  name          String
+  phone         String         @unique
+  email         String?
+  isVip         Boolean        @default(false)
+  totalOrders   Int            @default(0)
+  totalRevenue  Float          @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  orders        Order[]
+  addresses     Address[]
+  conversations Conversation[]
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [id])
+  label       String
+  district    String
+  city        String   @default("Istanbul")
+  fullAddress String
+  createdAt   DateTime @default(now())
+}
+
+model Order {
+  id               String   @id @default(uuid())
+  orderNo          String   @unique
+  customerId       String
+  customer         Customer @relation(fields: [customerId], references: [id])
+  status           String   @default("PENDING_PRICE")
+  pickupDistrict   String
+  pickupAddress    String
+  deliveryDistrict String
+  deliveryAddress  String
+  packageType      String
+  price            Float    @default(0)
+  priceApproved    Boolean  @default(false)
+  courierName      String?
+  note             String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Conversation {
+  id            String    @id @default(uuid())
+  customerId    String
+  customer      Customer  @relation(fields: [customerId], references: [id])
+  channel       String    @default("WHATSAPP")
+  waPhoneLine   String?
+  assignedTo    String?
+  status        String    @default("OPEN")
+  lastMessageAt DateTime?
+  isRead        Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  messages      Message[]
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  direction      String       @default("INBOUND")
+  content        String
+  aiSuggestion   String?
+  sentAt         DateTime     @default(now())
+}
