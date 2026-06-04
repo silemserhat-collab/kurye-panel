@@ -9,6 +9,7 @@ import CagriMerkezi from "./CagriMerkezi";
 import AktifIsler from "./AktifIsler";
 import KuryeTakip from "./KuryeTakip";
 import Raporlar from "./Raporlar";
+import Login from "./Login";
 
 const C = {
   bg: "#0D0F14",
